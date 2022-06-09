@@ -1,4 +1,4 @@
--- 1. 교수 정보 뷰 생성
+-- 1. (김세진) 교수 정보 뷰 생성
 CREATE VIEW PROF_INFO AS
 SELECT prof.id  AS 교수코드, prof.name AS 교수, prof.email  AS 이메일, dept.name AS 학부,dept.field AS 부서
 FROM PROFESSOR prof RIGHT JOIN DEPARTMENT dept
@@ -9,7 +9,7 @@ SELECT * from PROF_INFO;
 
 DROP VIEW PROF_INFO;
 
--- 2. 수강 신청 정보 뷰 생성
+-- 2. (이관용) 수강 신청 정보 뷰 생성
 CREATE VIEW REG_LIST AS
 SELECT reg.id AS 고유번호, stu.id AS 학번, stu.name AS 학생이름, dept.name AS 학부, 
 	   sub.id AS 강의코드,sub.name AS 강의, prof.name AS 교수, 
@@ -25,7 +25,7 @@ SELECT * from REG_LIST;
 DROP VIEW REG_LIST;
 
 
--- 3. 수강 신청 프로시저 : 월로 학기를 나누고 재수강 신청일 경우 재수강 신청 카운트를 1추가, 
+-- 3. (이관용) 수강 신청 프로시저 : 월로 학기를 나누고 재수강 신청일 경우 재수강 신청 카운트를 1추가, 
 -- 신규 수강신청일 경우 디폴트값 대입
 -- REGISTRATION 테이블 생성시, 유니크 처리를 했기에 재수강이 아닌 동일 학번, 동일 강의는 신청 불가하게 처리
 DELIMITER //
@@ -59,7 +59,7 @@ DELIMITER ;
 CALL CREATE_REG(20191003,4003);
 DROP PROCEDURE CREATE_REG;
 
--- 4. 수강 취소 프로시저
+-- 4. (이성민) 수강 취소 프로시저
 SELECT * FROM REGISTRATION;
 
 DELIMITER //
@@ -75,7 +75,7 @@ CALL CANCLE_REG(11);
 DROP PROCEDURE CANCLE_REG;
 
 
--- 5. 교수의 학생 성적 입력 프로시저
+-- 5. (김세진) 교수의 학생 성적 입력 프로시저
 SELECT * from PROF_INFO;
 SELECT * FROM REG_LIST WHERE 교수 = '최종주';
 
@@ -96,7 +96,7 @@ DROP PROCEDURE INPUT_GRADE;
 
 
 
--- 6. REGISTRATION 테이블 내용 삭제 백업 트리거
+-- 6. (이성민) REGISTRATION 테이블 내용 삭제 백업 트리거
 DROP TABLE BACKUP_REGISTRATION;
 
 CREATE TABLE BACKUP_REGISTRATION(
@@ -135,7 +135,7 @@ SELECT * FROM BACKUP_REGISTRATION;
 DROP TRIGGER BACKUP_TRIGGER;
 
 
--- 7. 백업된 REGISTRATION을 Rollback하는 프로시저 
+-- 7. (이관용) 백업된 REGISTRATION을 Rollback하는 프로시저 
 DELIMITER //
 CREATE PROCEDURE ROLLBACK (
 v_id INT
@@ -157,7 +157,7 @@ SELECT * FROM REGISTRATION;
 
 DROP PROCEDURE ROLLBACK;
 
--- 8. 잘못된 교과목 코드 insert시 오류 문장 뜨게 하는 트리거
+-- 8. (이성민) 잘못된 교과목 코드 insert시 오류 문장 뜨게 하는 트리거
 DELIMITER //
 CREATE TRIGGER WRONG_INSERT
 BEFORE INSERT 
@@ -177,7 +177,7 @@ CALL CREATE_REG(20221312,4011);
 DROP TRIGGER WRONG_INSERT;
 
 
--- 9. 여석(spare)을 카운팅하여 그 이상이 될 경우 신청 불가하게 만드는 트리거
+-- 9. (이관용) 여석(spare)을 카운팅하여 그 이상이 될 경우 신청 불가하게 만드는 트리거
 DELIMITER //
 CREATE TRIGGER LEFT_COUNT 
 BEFORE INSERT ON REGISTRATION
@@ -204,7 +204,7 @@ BEGIN
 END //
 DELIMITER ;
 
--- 10. 수강 시간 이외에 신청시 오류 메시지 
+-- 10. (이성민) 수강 시간 이외에 신청시 오류 메시지 
 SELECT sysdate() FROM DUAL;
 SELECT DATE_FORMAT(sysdate(), '%H:%i') FROM DUAL;
 
@@ -226,7 +226,7 @@ CALL CREATE_REG(20221312,4010);
 
 SELECT * FROM REGISTRATION;
 
--- 11. 학생마다 성적에 따라 신청 학점이 정해져있는 트리거
+-- 11. (이관용) 학생마다 성적에 따라 신청 학점이 정해져있는 트리거
 DELIMITER //
 CREATE TRIGGER LIMIT_REG
 BEFORE INSERT 
@@ -261,7 +261,7 @@ DELIMITER ;
 
 DROP TRIGGER LIMIT_REG;
 
--- 12. 수강신청 한 학생들 중에서 서울에 사는 사람의 학점
+-- 12. (김세진) 수강신청 한 학생들 중에서 서울에 사는 사람의 학점
 SELECT DISTINCT stu.id, name, address, exam_avg
 FROM STUDENT stu INNER JOIN SCORE scr ON stu.id = scr.stu_id
 			   INNER JOIN REGISTRATION reg ON stu.id = reg.stu_id 
